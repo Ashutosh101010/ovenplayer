@@ -16,15 +16,6 @@ import {
     PLAYER_NOT_ACCEPTABLE_ERROR, STATE_PLAYING, CONTENT_LEVEL_CHANGED, AUDIO_TRACK_CHANGED
 } from "api/constants";
 
-import sizeHumanizer from "utils/sizeHumanizer";
-
-/**
- * @brief   hlsjs provider extended core.
- * @param   container player element.
- * @param   playerConfig    config.
- * */
-
-
 const HlsProvider = function (element, playerConfig, adTagUrl) {
     let that = {};
     let hls = null;
@@ -35,7 +26,6 @@ const HlsProvider = function (element, playerConfig, adTagUrl) {
     let firstLoaded = false;
 
     try {
-
         let hlsConfig = {
             debug: false
         };
@@ -43,23 +33,19 @@ const HlsProvider = function (element, playerConfig, adTagUrl) {
         let hlsConfigFromPlayerConfig = playerConfig.getConfig().hlsConfig;
 
         if (hlsConfigFromPlayerConfig) {
-
             for (let key in hlsConfigFromPlayerConfig) {
                 hlsConfig[key] = hlsConfigFromPlayerConfig[key];
             }
         }
 
         if (playerConfig.getConfig().licenseCustomHeader) {
-
             const licenseXhrSetup = function (xhr, url, keyContext, licenseChallenge) {
                 xhr.setRequestHeader(playerConfig.getConfig().licenseCustomHeader.key, playerConfig.getConfig().licenseCustomHeader.value);
             };
-
             hlsConfig.licenseXhrSetup = licenseXhrSetup;
         }
 
         hls = new Hls(hlsConfig);
-
         window.op_hls = hls;
 
         hls.attachMedia(element);
@@ -88,35 +74,31 @@ const HlsProvider = function (element, playerConfig, adTagUrl) {
 
         that = Provider(spec, playerConfig, function (source, lastPlayPosition) {
 
-            OvenPlayerConsole.log("HLS : onExtendedLoad : ", source, "lastPlayPosition : " + lastPlayPosition);
-
             that.trigger(HLS_PREPARED, hls);
 
             hls.loadSource(source.file);
 
             hls.once(Hls.Events.MANIFEST_LOADED, function (event, data) {
-
                 isManifestLoaded = true;
 
                 for (let i = 0; i < hls.levels.length; i++) {
-
                     let qualityLevel = hls.levels[i];
-
                     spec.qualityLevels.push({
                         bitrate: qualityLevel.bitrate,
                         height: qualityLevel.height,
                         width: qualityLevel.width,
                         index: i,
-                        label: qualityLevel.width + "x" + qualityLevel.height + ", " + sizeHumanizer(qualityLevel.bitrate, true, "bps")
+                        label: qualityLevel.height + "p"
                     });
                 }
 
-                spec.currentQuality = hls.firstLevel;
+                // ✅ Force the lowest quality (index 0) and disable auto level
+                hls.startLevel = 0;
+                hls.currentLevel = 0;
+                spec.currentQuality = 0;
 
                 for (let i = 0; i < hls.audioTracks.length; i++) {
-
                     let audioTrack = hls.audioTracks[i];
-
                     spec.audioTracks.push({
                         index: audioTrack.id,
                         label: audioTrack.name
@@ -129,7 +111,6 @@ const HlsProvider = function (element, playerConfig, adTagUrl) {
             });
 
             hls.once(Hls.Events.LEVEL_LOADED, function (event, data) {
-
                 firstLoaded = true;
 
                 if (loadRetryer) {
@@ -139,27 +120,22 @@ const HlsProvider = function (element, playerConfig, adTagUrl) {
 
                 if (data.details.live) {
                     spec.isLive = true;
-                } else {
-
-                    if (lastPlayPosition && lastPlayPosition >= 0) {
-                        that.seek(lastPlayPosition);
-                    }
+                } else if (lastPlayPosition && lastPlayPosition >= 0) {
+                    that.seek(lastPlayPosition);
                 }
             });
 
             hls.on(Hls.Events.LEVEL_SWITCHED, function (event, data) {
-
                 spec.currentQuality = data.level;
 
                 that.trigger(CONTENT_LEVEL_CHANGED, {
-                    isAuto: hls.autoLevelEnabled,
+                    isAuto: false,
                     currentQuality: spec.currentQuality,
                     type: "render"
                 });
             });
 
             hls.on(Hls.Events.AUDIO_TRACK_SWITCHED, function (event, data) {
-
                 spec.currentAudioTrack = data.id;
                 that.trigger(AUDIO_TRACK_CHANGED, {
                     currentAudioTrack: spec.currentAudioTrack
@@ -170,13 +146,10 @@ const HlsProvider = function (element, playerConfig, adTagUrl) {
                 if (data && data.details) {
                     spec.dvrWindow = data.details.totalduration;
                 }
-
             });
 
             hls.on(Hls.Events.ERROR, function (event, data) {
-
                 if (data && data.networkDetails && data.networkDetails.status === 202) {
-
                     if (loadRetryer) {
                         clearTimeout(loadRetryer);
                         loadRetryer = null;
@@ -185,32 +158,32 @@ const HlsProvider = function (element, playerConfig, adTagUrl) {
                     that.setState(STATE_LOADING);
 
                     loadRetryer = setTimeout(function () {
-
                         if (hls) {
-
                             that.stop();
                             hls.stopLoad();
                             hls.loadSource(source.file);
                         }
-
                     }, 1000);
 
                     return;
                 }
 
-                if (!data.fatal) {
-                    // do nothing when non fatal error. hlsjs will recover it automatically.
-                    return;
-                }
+                if (!data.fatal) return;
 
                 let errorType = PLAYER_UNKNWON_NETWORK_ERROR;
 
-                if (data && data.networkDetails && data.networkDetails.status === 400) {
-                    errorType = PLAYER_BAD_REQUEST_ERROR;
-                } else if (data && data.networkDetails && data.networkDetails.status === 403) {
-                    errorType = PLAYER_AUTH_FAILED_ERROR;
-                } else if (data && data.networkDetails && data.networkDetails.status === 406) {
-                    errorType = PLAYER_NOT_ACCEPTABLE_ERROR;
+                if (data && data.networkDetails) {
+                    switch (data.networkDetails.status) {
+                        case 400:
+                            errorType = PLAYER_BAD_REQUEST_ERROR;
+                            break;
+                        case 403:
+                            errorType = PLAYER_AUTH_FAILED_ERROR;
+                            break;
+                        case 406:
+                            errorType = PLAYER_NOT_ACCEPTABLE_ERROR;
+                            break;
+                    }
                 }
 
                 let tempError = ERRORS.codes[errorType];
@@ -219,16 +192,12 @@ const HlsProvider = function (element, playerConfig, adTagUrl) {
             });
 
             that.on(PLAYER_STATE, function (data) {
-
                 if (!firstLoaded && data.prevstate === STATE_LOADING && data.newstate === STATE_IDLE) {
-
                     if (loadRetryer) {
                         clearTimeout(loadRetryer);
                         loadRetryer = null;
                     }
-
                     if (hls) {
-
                         hls.stopLoad();
                     }
                 }
@@ -236,10 +205,8 @@ const HlsProvider = function (element, playerConfig, adTagUrl) {
         });
 
         that.setCurrentQuality = (qualityIndex) => {
-
             hls.currentLevel = qualityIndex;
             spec.currentQuality = qualityIndex;
-
             return spec.currentQuality;
         };
 
@@ -248,51 +215,39 @@ const HlsProvider = function (element, playerConfig, adTagUrl) {
         };
 
         that.setAutoQuality = (isAuto) => {
-            if (isAuto) {
-                hls.currentLevel = -1;
-            } else {
-                hls.currentLevel = hls.currentLevel;
-            }
+
         };
 
         that.setCurrentAudioTrack = (audioTrackIndex) => {
             hls.audioTrack = audioTrackIndex;
             spec.currentAudioTrack = audioTrackIndex;
-
             return spec.currentAudioTrack;
         };
 
         that.getDuration = () => {
             return element.duration;
-        }
+        };
 
         superStop_func = that.super('stop');
         that.stop = () => {
-
             if (loadRetryer) {
-
                 clearTimeout(loadRetryer);
                 loadRetryer = null;
             }
-
             if (hls) {
                 hls.stopLoad();
             }
-
             superStop_func();
         };
 
         superDestroy_func = that.super('destroy');
         that.destroy = () => {
-
             if (loadRetryer) {
-
                 clearTimeout(loadRetryer);
                 loadRetryer = null;
             }
 
             if (hls) {
-
                 hls.destroy();
                 that.trigger(HLS_DESTROYED);
             }
@@ -311,6 +266,5 @@ const HlsProvider = function (element, playerConfig, adTagUrl) {
 
     return that;
 };
-
 
 export default HlsProvider;

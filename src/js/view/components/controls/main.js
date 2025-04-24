@@ -92,12 +92,12 @@ const Controls = function ($container, api) {
         }
 
         function initFullscreenButton() {
-            if (fullScreenButton) {
-                // Don't need to destroy.
-                return;
-                // fullScreenButton.destroy();
-            }
-            fullScreenButton = FullScreenButton($current.find(".fullscreen-holder"), api);
+            // if (fullScreenButton) {
+            //     // Don't need to destroy.
+            //     return;
+            //     // fullScreenButton.destroy();
+            // }
+            // fullScreenButton = FullScreenButton($current.find(".fullscreen-holder"), api);
         }
 
         function makeControlUI(metadata) {

@@ -38,6 +38,7 @@ const TimeDisplay = function ($container, api, data) {
     $liveBadge = $current.find(".op-live-badge");
     $liveText = $current.find(".op-live-text");
 
+
     if (data && data.type === PROVIDER_HLS && data.duration === Infinity) {
       hlsLive = true;
 
@@ -82,8 +83,10 @@ const TimeDisplay = function ($container, api, data) {
           if (!api.getConfig().legacyUI) {
             if (data.duration - data.position > 3) {
               $liveBadge.addClass('op-live-badge-delayed');
+              $liveText.text("Go Live");
             } else {
               $liveBadge.removeClass('op-live-badge-delayed');
+              $liveText.text("Live Streaming");
             }
           }
         }, template);
@@ -95,8 +98,10 @@ const TimeDisplay = function ($container, api, data) {
             const dvrWindow = getNativeHlsDvrWindow();
             if (dvrWindow - data.position > 3) {
               $liveBadge.addClass('op-live-badge-delayed');
+              $liveText.text("Go Live");
             } else {
               $liveBadge.removeClass('op-live-badge-delayed');
+              $liveText.text("Live Streaming");
             }
           }
         }, template);
@@ -138,9 +143,9 @@ const TimeDisplay = function ($container, api, data) {
       }
     },
   };
-
   return OvenTemplate($container, "TimeDisplay", api.getConfig(), data, events, onRendered, onDestroyed);
 };
 
 
 export default TimeDisplay;
+

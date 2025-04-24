@@ -90,18 +90,18 @@ const SettingButton = function ($container, api) {
             panel.body.push(body);
         }
 
-        if (audioTracks && audioTracks.length > 0) {
+        // if (audioTracks && audioTracks.length > 0) {
 
-            let body = {
-                title: PANEL_TITLE.audioTrack,
-                value: currentAudioTrack ? currentAudioTrack.label : "Default",
-                description: currentAudioTrack ? currentAudioTrack.label : "Default",
-                panelType: "audioTrack",
-                hasNext: true
-            };
+        //     let body = {
+        //         title: PANEL_TITLE.audioTrack,
+        //         value: currentAudioTrack ? currentAudioTrack.label : "Default",
+        //         description: currentAudioTrack ? currentAudioTrack.label : "Default",
+        //         panelType: "audioTrack",
+        //         hasNext: true
+        //     };
 
-            panel.body.push(body);
-        }
+        //     panel.body.push(body);
+        // }
 
         if (captions && captions.length > 0) {
 
@@ -163,3 +163,4 @@ const SettingButton = function ($container, api) {
 
 
 export default SettingButton;
+

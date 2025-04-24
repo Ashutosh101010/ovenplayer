@@ -53,14 +53,10 @@
       flex-wrap: wrap;
     }
 
-    .source-protocol {}
-
     .source-url {
       margin-top: 0.25rem;
       word-break: break-all;
     }
-
-    .source-control {}
 
     .player-area {
       position: relative;
@@ -118,7 +114,7 @@
   <script src="https://cdn.jsdelivr.net/npm/hls.js/dist/hls.min.js"></script>
 
   <!-- OvenPlayer -->
-  <script src="https://cdn.jsdelivr.net/npm/ovenplayer/dist/ovenplayer.js"></script>
+  <script src="../dist/ovenplayer.js"></script>
 </head>
 
 <body>
@@ -666,7 +662,7 @@
           createScript: null,
           createScriptHTML: null,
           playerVersion: null
-        }
+        };
       },
       methods: {
         addSource: function () {
@@ -689,7 +685,7 @@
               protocol = "hls";
 
               if (url.endsWith('llhls.m3u8')) {
-                protocol = 'll-hls'
+                protocol = 'll-hls';
               }
             } else if (url.indexOf('.mpd') > 0) {
 
@@ -756,8 +752,8 @@
               console.log(data, meta);
               if (meta && meta.samples) {
                 meta.samples.forEach(function (sample) {
-                  console.log(new TextDecoder("utf-8").decode(sample.data))
-                })
+                  console.log(new TextDecoder("utf-8").decode(sample.data));
+                });
               }
 
             });
@@ -1162,7 +1158,7 @@
 
             if (this.playerOption.hlsConfig && this.playerOption.hlsConfig.drmSystems
               && this.playerOption.hlsConfig.drmSystems["com.apple.fps"]) {
-              return this.playerOption.hlsConfig.drmSystems["com.apple.fps"].licenseUrl
+              return this.playerOption.hlsConfig.drmSystems["com.apple.fps"].licenseUrl;
             }
           },
           set: function (value) {
@@ -1212,7 +1208,7 @@
 
             if (this.playerOption.hlsConfig && this.playerOption.hlsConfig.drmSystems
               && this.playerOption.hlsConfig.drmSystems["com.apple.fps"]) {
-              return this.playerOption.hlsConfig.drmSystems["com.apple.fps"].serverCertificateUrl
+              return this.playerOption.hlsConfig.drmSystems["com.apple.fps"].serverCertificateUrl;
             }
           },
           set: function (value) {
@@ -1262,7 +1258,7 @@
 
             if (this.playerOption.hlsConfig && this.playerOption.hlsConfig.drmSystems
               && this.playerOption.hlsConfig.drmSystems["com.widevine.alpha"]) {
-              return this.playerOption.hlsConfig.drmSystems["com.widevine.alpha"].licenseUrl
+              return this.playerOption.hlsConfig.drmSystems["com.widevine.alpha"].licenseUrl;
             }
           },
           set: function (value) {
@@ -1311,7 +1307,7 @@
           get: function () {
 
             if (this.playerOption.licenseCustomHeader && this.playerOption.licenseCustomHeader.key) {
-              return this.playerOption.licenseCustomHeader.key
+              return this.playerOption.licenseCustomHeader.key;
             }
           },
           set: function (value) {
@@ -1342,7 +1338,7 @@
           get: function () {
 
             if (this.playerOption.licenseCustomHeader && this.playerOption.licenseCustomHeader.value) {
-              return this.playerOption.licenseCustomHeader.value
+              return this.playerOption.licenseCustomHeader.value;
             }
           },
           set: function (value) {

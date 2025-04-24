@@ -51,7 +51,7 @@ const SupportChecker = function(){
 
                 // Use HLS native player on iOS only
                 if (isHls(file, type) && userAgentObject.os !== "iOS") {
-                    return false;
+                    return true;
                 }
 
                 // Latest Edge browser returns "Chrome" from userAgentObject.browser

@@ -198,7 +198,7 @@ const Panels = function ($container, api, data) {
                     if ($panel.attr("op-panel-type") === "quality") {
                         let qualityList = api.getQualityLevels();
                         let newQualityObject = qualityList[newQuality];
-                        $panel.find(".op-setting-item-value").text(newQualityObject.width + "x" + newQualityObject.height + ", " + sizeHumanizer(newQualityObject.bitrate, true, "bps"));
+                        $panel.find(".op-setting-item-value").text(newQualityObject.height + "p");
                     }
 
                 });
