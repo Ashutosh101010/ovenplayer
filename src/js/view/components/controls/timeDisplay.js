@@ -87,13 +87,15 @@ const TimeDisplay = function ($container, api, data) {
             } else {
               $liveBadge.removeClass('op-live-badge-delayed');
               $liveText.text("Live Streaming");
+              if (api.getPlaybackRate() !== 1) {
+                api.setPlaybackRate(1);
+              }
             }
           }
         }, template);
       } else if (hlsLive && nativeHlsLive) {
 
         api.on(CONTENT_TIME, function (data) {
-
           if (!api.getConfig().legacyUI) {
             const dvrWindow = getNativeHlsDvrWindow();
             if (dvrWindow - data.position > 3) {
@@ -102,11 +104,14 @@ const TimeDisplay = function ($container, api, data) {
             } else {
               $liveBadge.removeClass('op-live-badge-delayed');
               $liveText.text("Live Streaming");
+              if (api.getPlaybackRate() !== 1) {
+                api.setPlaybackRate(1);
+              }
             }
           }
         }, template);
       }
-    }
+    };
 
   };
 
