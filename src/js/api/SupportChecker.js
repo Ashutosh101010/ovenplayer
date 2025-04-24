@@ -1,11 +1,11 @@
-import {isRtmp, isWebRTC, isDash, isHls} from "utils/validator";
-import {analUserAgent} from "utils/browser";
+import { isRtmp, isWebRTC, isDash, isHls } from "utils/validator";
+import { analUserAgent } from "utils/browser";
 /**
  * @brief   This finds the provider that matches the input source.
  * @param
  * */
 
-const SupportChecker = function(){
+const SupportChecker = function () {
     const that = {};
     OvenPlayerConsole.log("SupportChecker loaded.");
     let userAgentObject = analUserAgent();
@@ -33,8 +33,8 @@ const SupportChecker = function(){
                     hls: 'application/vnd.apple.mpegurl'
                 };
 
-                const video = function(){
-                    return document.createElement('video')
+                const video = function () {
+                    return document.createElement('video');
                 }();
                 if (!video.canPlayType) {
                     return false;
@@ -45,13 +45,13 @@ const SupportChecker = function(){
                 const type = source.type;
                 const overrideNative = source.overrideNative;
 
-                if(!type){return false;}
+                if (!type) { return false; }
 
                 const mimeType = source.mimeType || MimeTypes[type];
 
                 // Use HLS native player on iOS only
                 if (isHls(file, type) && userAgentObject.os !== "iOS") {
-                    return true;
+                    return false;
                 }
 
                 // Latest Edge browser returns "Chrome" from userAgentObject.browser
@@ -82,8 +82,8 @@ const SupportChecker = function(){
         {
             name: 'webrtc',
             checkSupport: function (source) {
-                const video = function(){
-                    return document.createElement('video')
+                const video = function () {
+                    return document.createElement('video');
                 }();
                 if (!video.canPlayType) {
                     return false;
@@ -95,9 +95,9 @@ const SupportChecker = function(){
                 const file = source.file;
                 const type = source.type;
 
-                if(isWebRTC(file, type)){
+                if (isWebRTC(file, type)) {
                     return true;
-                }else{
+                } else {
                     return false;
                 }
             }
@@ -112,9 +112,9 @@ const SupportChecker = function(){
                     return false;
                 }
 
-                if (typeof ( window.MediaSource || window.WebKitMediaSource ) === "function" && isDash(file, type)) {
+                if (typeof (window.MediaSource || window.WebKitMediaSource) === "function" && isDash(file, type)) {
                     return true;
-                }else{
+                } else {
                     return false;
                 }
             }
@@ -122,8 +122,8 @@ const SupportChecker = function(){
         {
             name: 'hls',
             checkSupport: function (source) {
-                const video = function(){
-                    return document.createElement('video')
+                const video = function () {
+                    return document.createElement('video');
                 }();
                 const file = source.file;
                 const type = source.type;
@@ -132,8 +132,8 @@ const SupportChecker = function(){
                 }
 
                 //this method from hls.js
-                const isHlsSupport = () =>{
-                     function getMediaSource() {
+                const isHlsSupport = () => {
+                    function getMediaSource() {
                         if (typeof window !== 'undefined') {
                             return window.MediaSource || window.WebKitMediaSource;
                         }
@@ -162,11 +162,11 @@ const SupportChecker = function(){
                     var support = false;
 
                     //IE only
-                    if("ActiveXObject" in window) {
+                    if ("ActiveXObject" in window) {
 
-                        try{
+                        try {
                             support = !!(new ActiveXObject("ShockwaveFlash.ShockwaveFlash"));
-                        }catch(e){
+                        } catch (e) {
                             support = false;
                         }
 
@@ -180,16 +180,16 @@ const SupportChecker = function(){
                     return support;
 
                 }
-                function checkSupport(){
-                    if(userAgentObject.browser === "Microsoft Edge" || userAgentObject.os === "Android" || userAgentObject.os === "iOS"  || userAgentObject.browser === "Safari"){
+                function checkSupport() {
+                    if (userAgentObject.browser === "Microsoft Edge" || userAgentObject.os === "Android" || userAgentObject.os === "iOS" || userAgentObject.browser === "Safari") {
                         return false;
-                    }else{
+                    } else {
                         return true;
                     }
                 }
                 if (isRtmp(file, type) && testFlash() && checkSupport()) {
                     return true;
-                }else{
+                } else {
                     return false;
                 }
             }
@@ -199,8 +199,8 @@ const SupportChecker = function(){
     that.findProviderNameBySource = (soruce_) => {
         OvenPlayerConsole.log("SupportChecker : findProviderNameBySource()", soruce_);
         const source = (soruce_ === Object(soruce_)) ? soruce_ : {};
-        for(var i = 0; i < supportList.length; i ++){
-            if(supportList[i].checkSupport(source)){
+        for (var i = 0; i < supportList.length; i++) {
+            if (supportList[i].checkSupport(source)) {
                 return supportList[i].name;
             }
         }
@@ -214,8 +214,8 @@ const SupportChecker = function(){
         }*/
         const item = playlistItem;
 
-        if(item && item.sources){
-            for(let j = 0; j < item.sources.length; j ++){
+        if (item && item.sources) {
+            for (let j = 0; j < item.sources.length; j++) {
                 let source = item.sources[j];
                 if (source) {
                     const supported = that.findProviderNameBySource(source);
